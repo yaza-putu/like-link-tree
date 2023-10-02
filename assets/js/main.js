@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
   let targets = document.querySelectorAll('[data-target]');
-  let playIcons = document.querySelectorAll('.fa-volume-high');
+  let playIcons = document.querySelectorAll('.main_a_item');
   let currentAudio = null;
 
   // Function untuk mengatur tampilan berdasarkan bahasa terpilih
@@ -15,23 +15,6 @@ document.addEventListener('DOMContentLoaded', function () {
     sessionStorage.setItem('selectedLanguage', targetId);
   }
 
-  // Function untuk memainkan audio
-  function playAudio(audio) {
-    if (currentAudio && currentAudio !== audio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-    }
-
-    if (audio !== currentAudio) {
-      audio.play();
-      currentAudio = audio;
-    } else {
-      audio.pause();
-      audio.currentTime = 0;
-      currentAudio = null;
-    }
-  }
-
   // Function untuk menangani klik pada gambar bahasa
   function handleLanguageImageClick(index) {
     const radio = document.getElementById(`header_nav_menu_item_${index}`);
@@ -41,13 +24,6 @@ document.addEventListener('DOMContentLoaded', function () {
   targets.forEach(element => {
     element.addEventListener('click', () => {
       setLanguage(element.dataset.target.slice(1)); // Ambil id target dan lewati karakter '#'
-    });
-  });
-
-  playIcons.forEach(function (playIcon) {
-    playIcon.addEventListener('click', function () {
-      const audio = this.querySelector('audio');
-      playAudio(audio);
     });
   });
 
@@ -69,6 +45,13 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('header_nav_menu_item_1').checked = true;
   }
 
+  window.addEventListener('load', function () {
+    const selectedLanguage = sessionStorage.getItem('selectedLanguage');
+    if (selectedLanguage) {
+      document.querySelector(`[data-target="#${selectedLanguage}"]`).checked = true;
+    }
+  });
+
   const numPairs = 3;
 
   for (let i = 1; i <= numPairs; i++) {
@@ -77,4 +60,38 @@ document.addEventListener('DOMContentLoaded', function () {
       handleLanguageImageClick(i);
     });
   }
+
+  // Function untuk memainkan audio dan mengubah ikon
+  function playAudio(audio, playIcon) {
+    if (currentAudio && currentAudio !== audio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      playIcon.querySelector('i').classList.remove('fa-pause');
+      playIcon.querySelector('i').classList.add('fa-volume-high');
+    }
+
+    if (audio !== currentAudio) {
+      audio.play();
+      currentAudio = audio;
+      playIcon.querySelector('i').classList.remove('fa-volume-high');
+      playIcon.querySelector('i').classList.add('fa-pause');
+    } else {
+      if (audio.paused) {
+        audio.play();
+        playIcon.querySelector('i').classList.remove('fa-volume-high');
+        playIcon.querySelector('i').classList.add('fa-pause');
+      } else {
+        audio.pause();
+        playIcon.querySelector('i').classList.remove('fa-pause');
+        playIcon.querySelector('i').classList.add('fa-volume-high');
+      }
+    }
+  }
+
+  playIcons.forEach(function (playIcon) {
+    playIcon.addEventListener('click', function () {
+      const audio = this.querySelector('audio');
+      playAudio(audio, this);
+    });
+  });
 });
