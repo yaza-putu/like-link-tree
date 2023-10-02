@@ -62,31 +62,37 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Function untuk memainkan audio dan mengubah ikon
-  function playAudio(audio, playIcon) {
-    if (currentAudio && currentAudio !== audio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-      playIcon.querySelector('i').classList.remove('fa-pause');
-      playIcon.querySelector('i').classList.add('fa-volume-high');
+function playAudio(audio, playIcon) {
+  if (currentAudio && currentAudio !== audio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    const prevPlayIcon = document.querySelector('.fa-pause');
+    if (prevPlayIcon) {
+      prevPlayIcon.classList.remove('fa-pause');
+      prevPlayIcon.classList.add('fa-volume-high');
     }
+  }
 
-    if (audio !== currentAudio) {
+  if (audio !== currentAudio) {
+    audio.play();
+    currentAudio = audio;
+    playIcon.querySelector('i').classList.remove('fa-volume-high');
+    playIcon.querySelector('i').classList.add('fa-pause');
+  } else {
+    if (audio.paused) {
       audio.play();
-      currentAudio = audio;
       playIcon.querySelector('i').classList.remove('fa-volume-high');
       playIcon.querySelector('i').classList.add('fa-pause');
     } else {
-      if (audio.paused) {
-        audio.play();
-        playIcon.querySelector('i').classList.remove('fa-volume-high');
-        playIcon.querySelector('i').classList.add('fa-pause');
-      } else {
-        audio.pause();
-        playIcon.querySelector('i').classList.remove('fa-pause');
-        playIcon.querySelector('i').classList.add('fa-volume-high');
-      }
+      audio.pause();
+      audio.currentTime = 0; // Kembalikan waktu audio ke awal
+      playIcon.querySelector('i').classList.remove('fa-pause');
+      playIcon.querySelector('i').classList.add('fa-volume-high');
     }
   }
+}
+
+
 
   playIcons.forEach(function (playIcon) {
     playIcon.addEventListener('click', function () {
